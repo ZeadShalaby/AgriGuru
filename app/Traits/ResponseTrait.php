@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Validator;
 
 trait ResponseTrait
 {
-    //todo check validate done or not
+    //?todo check validate done or not
     public function validate($request, array $rules, array $messages = [], array $attributes = [])
     {
 
@@ -20,6 +20,7 @@ trait ResponseTrait
         return true;
 
     }
+
     // ?todo return Locale for languages
     public function getCurrentLang()
     {

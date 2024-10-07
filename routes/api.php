@@ -21,12 +21,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::POST('/login', [UsersController::class, 'login']);
-
-
-
 Route::group(['middleware' => ['api']], function () {
-    Route::POST('/register', [UserController::class, 'register']);
+
+
+    Route::POST('/login', [UsersController::class, 'login']);
+
+    Route::POST('/register', [UsersController::class, 'register']);
 
     Route::group(['middleware' => ['auth.guard:api']], function () {
 
