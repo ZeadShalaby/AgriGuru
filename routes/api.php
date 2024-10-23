@@ -27,7 +27,6 @@ Route::group(['middleware' => ['api']], function () {
     Route::POST('/login', [UsersController::class, 'login']);
 
     Route::POST('/register', [UsersController::class, 'register']);
-    Route::POST('/register', [UsersController::class, 'register']);
 
     Route::group(['middleware' => ['auth.guard:api']], function () {
 
