@@ -23,7 +23,8 @@ class AssignGuard
     {
         if ($guard != null) {
             auth()->shouldUse($guard);
-            $token = $request->token;
+            // $token = $request->token;
+            $token = $request->header('Authorization');
             $request->headers->set('token', (string) $token, true);
             $request->headers->set('Authorization', 'Bearer ' . $token, true);
             try {

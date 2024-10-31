@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
+use App\Models\Sensor;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -21,5 +22,8 @@ class DatabaseSeeder extends Seeder
             'password' => 'user1234',
             'phone' => '0124558155'
         ]);
+
+
+        $sensors = Sensor::factory(10)->create();
     }
 }

@@ -3,32 +3,31 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use Carbon\Carbon;
 use App\Models\User;
+use App\Mail\VerifyMail;
+use App\Traits\MethodTrait;
 use Illuminate\Http\Request;
 use App\Traits\ResponseTrait;
-use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
+use App\Traits\Requests\TestAuth;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UsersController extends Controller
 {
-    use ResponseTrait;
+    use ResponseTrait, MethodTrait, TestAuth;
     //
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = $this->validate($request, [
             'email' => 'required|email|exists:users,email',
             'password' => 'required|string|min:8|max:20',
         ]);
-
-        if ($validator->fails()) {
-            return $this->returnError('401', $validator->errors());
+        if ($validator !== true) {
+            return $validator;
         }
         try {
             $credentials = $request->only('email', 'password');
@@ -52,13 +51,15 @@ class UsersController extends Controller
             return $validator;
         }
         try {
-            User::create($request->all());
-            return $this->returnSuccessMessage("register successfully");
+            $user = User::create($request->all());
+            Mail::to($user->email)->send(new VerifyMail($user));
+            //? notification
+            $this->successNotification($user, 403, "Sir : " . $user->name . " Verifiy Your Account look your email");
+            return $this->returnSuccessMessage("Register Success", "R000");
         } catch (Exception $e) {
             return $this->returnError('500', $e->getMessage());
         }
     }
-
 
 
     // ?todo verify account users
@@ -75,9 +76,10 @@ class UsersController extends Controller
     }
 
     // ?todo edit return info for user
-    public function edit(User $user)
+    public function edit()
     {
         try {
+            $user = auth()->user();
             return $this->returnData("user", $user);
         } catch (Exception $e) {
             return $this->returnError('500', "Server Error . , " . $e->getCode() . " , " . $e->getMessage());
@@ -85,13 +87,14 @@ class UsersController extends Controller
     }
 
     // ?todo update info for user
-    public function update(Request $request, User $user)
+    public function update(Request $request)
     {
         try {
             $validator = $this->validate($request, $this->rulesUpdateUsers());
             if ($validator !== true) {
                 return $validator;
             }
+            $user = User::findOrFail(auth()->user()->id);
             $user->update($request->all());
             return $this->returnSuccessMessage("Update Success", "U000");
         } catch (Exception $e) {
@@ -100,29 +103,14 @@ class UsersController extends Controller
     }
 
 
-    // // ?todo read notification for users
-    // public function readNotification(Request $request, $id)
-    // {
-    //     try {
-    //         $notification = auth()->user()->notifications()->find($id);
-    //         if ($notification) {
-    //             $notification->markAsRead();
-    //         }
-    //         return $this->returnSuccessMessage("Read Success", "R000");
-    //     } catch (Exception $e) {
-    //         return $this->returnError('500', "Server Error . , " . $e->getCode() . " , " . $e->getMessage());
-    //     }
-    // }
-
-
     // ?todo logout in account
     public function logout(Request $request)
     {
-        $token = $request->token;
+        $token = $request->header('Authorization');
         if (isset($token)) {
             try {
                 // ?todo logout
-                JWTAuth::setToken($token)->invalidate();
+                JWTAuth::setToken(str_replace('Bearer ', '', $token))->invalidate();
             } catch (TokenInvalidException $e) {
                 return $this->returnError("T003", "Some Thing Went Wrongs " . $e->getMessage());
             } catch (TokenExpiredException $e) {
