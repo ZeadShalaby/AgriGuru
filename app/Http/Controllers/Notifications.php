@@ -18,7 +18,7 @@ class Notifications extends Controller
     {
         try {
             $notifications = DatabaseNotification::where('notifiable_id', auth()->user()->id)->get();
-            return $notifications;
+            return $this->returnData("notify", $notifications);
         } catch (Exception $e) {
             return $this->returnError('500', "Server Error . , " . $e->getCode() . " , " . $e->getMessage());
         }

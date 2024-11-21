@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->integer('temperature');
             $table->integer('humidity');
             $table->integer('light');
-            $table->integer('gas');
-            $table->integer('soil_moisture');
+            $table->float('gas', 8, 2);  //? float with 8 digits, 2 after decimal            $table->integer('soil_moisture');
+            $table->integer("soil_moisture");
             $table->timestamps();
         });
     }

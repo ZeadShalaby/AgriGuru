@@ -22,7 +22,7 @@ class SensorFactory extends Factory
             'temperature' => $this->faker->numberBetween(-10, 50),
             'humidity' => $this->faker->numberBetween(0, 100),
             'light' => $this->faker->numberBetween(0, 1000),
-            'gas' => $this->faker->numberBetween(0, 500),
+            'gas' => $this->faker->numberBetween(0.01, 0.9),
             'soil_moisture' => $this->faker->numberBetween(0, 100),
         ];
     }

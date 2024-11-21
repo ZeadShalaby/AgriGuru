@@ -13,11 +13,11 @@ class CheckSensorOwner
 
     public function handle(Request $request, Closure $next)
     {
-        $sensor = Sensor::find($request->route('sensor_id'));
+        // $sensor = Sensor::find($request->route('sensor_id'));
 
-        if (!$sensor || $sensor->user_id !== auth()->id()) {
-            return $this->returnError('403', 'UnAuthorized Forbidden oops...');
-        }
+        // if (!$sensor || $sensor->user_id !== auth()->id()) {
+        //     return $this->returnError('403', 'UnAuthorized Forbidden oops...');
+        // }
 
         return $next($request);
     }

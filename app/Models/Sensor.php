@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SensorEnums;
 use App\Events\SensorEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,15 +36,17 @@ class Sensor extends Model
     ];
 
 
-    public function getSensorType()
+    public static function getSensorType($role)
     {
         $roles = [
-            SensorEvents::Degree->value => 'Degree',
-            SensorEvents::Humadity->value => 'Humadity',
-            SensorEvents::Ldr->value => 'LDR',
-            SensorEvents::Gas->value => 'Gas',
+            SensorEnums::Degree->value => 'temperature',
+            SensorEnums::Humadity->value => 'humidity',
+            SensorEnums::Ldr->value => 'light',
+            SensorEnums::Gas->value => 'gas',
+            SensorEnums::Soil->value => 'soil_moisture',
+
         ];
 
-        return $roles[$this->role] ?? 'Unknown';
+        return $roles[$role] ?? 'Unknown';
     }
 }

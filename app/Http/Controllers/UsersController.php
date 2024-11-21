@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\User;
+use App\Models\Media;
 use App\Mail\VerifyMail;
 use App\Traits\MethodTrait;
 use Illuminate\Http\Request;
 use App\Traits\ResponseTrait;
+use App\Traits\Requests\TestAuth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
-use App\Traits\Requests\TestAuth;
+use App\Traits\ImageTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
@@ -18,7 +20,7 @@ use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class UsersController extends Controller
 {
-    use ResponseTrait, MethodTrait, TestAuth;
+    use ResponseTrait, MethodTrait, TestAuth, ImageTrait;
     //
     public function login(Request $request)
     {
@@ -35,7 +37,7 @@ class UsersController extends Controller
             if (!$token) {
                 return $this->returnError('401', 'information not valid');
             }
-            $user = Auth::guard('api')->user();
+            $user = Auth::guard('api')->user()->load('media_one');
             $user->token = $token;
             return $this->returnData("users", $user);
 
@@ -67,7 +69,7 @@ class UsersController extends Controller
     {
         try {
             $user = User::find($id);
-            $user->email_verified_at = now();
+            $user->email_verified_at = now(); //? date now
             $user->save();
             // return $this->returnSuccessMessage("Verify Success", "V000");
         } catch (Exception $e) {
@@ -79,7 +81,7 @@ class UsersController extends Controller
     public function edit()
     {
         try {
-            $user = auth()->user();
+            $user = auth()->user();  //? return info for this user
             return $this->returnData("user", $user);
         } catch (Exception $e) {
             return $this->returnError('500', "Server Error . , " . $e->getCode() . " , " . $e->getMessage());
@@ -99,6 +101,39 @@ class UsersController extends Controller
             return $this->returnSuccessMessage("Update Success", "U000");
         } catch (Exception $e) {
             return $this->returnError('500', "Server Error . , " . $e->getCode() . " , " . $e->getMessage());
+        }
+    }
+
+    // ?todo return users image
+    public function imagesuser(Request $request, $img)
+    {
+        try {
+            $filename = $img;
+            if (file_exists(public_path('images/users/' . $filename))) {
+                return $this->returnimageusers($filename, 'images/users/');
+            }
+            //? img not found
+            return $this->returnError('error', 'Image not found');
+        } catch (Exception $ex) {
+            return $this->returnError('error', $ex->getMessage());
+        }
+    }
+
+    // ?todo change image of users 
+    public function changeimg(Request $request)
+    {
+        try {
+            //? Validate the request if needed
+            $request->validate(['media' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',]);
+            //? Get the user's media
+            $user_media = Media::where('mediaable_type', 'User')->where('mediaable_id', auth()->user()->id)->first();
+            //? Save the new image
+            $path = $this->saveimage($request->file('media'), 'images/users/', );
+            //? Update the media record
+            $user_media->update(['media' => $path]);
+            return $this->returnSuccessMessage('Image Changed Successfully .');
+        } catch (Exception $ex) {
+            return $this->returnError('error', $ex->getMessage());
         }
     }
 

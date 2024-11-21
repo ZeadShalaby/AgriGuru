@@ -266,8 +266,7 @@
                                             alt="t" style="display: inline-block; color: #cccccc" /></a>
                                 </p>
                                 <p style="margin: 0; font-size: 14px; line-height: 20px">
-                                    &reg; Alex Lempka, Co-Founder and CEO, founded Connect Earth In 2021<br /><a
-                                        class="unsub" href="#"
+                                    &reg; © 2024 AgriGuru. All rights reserved.<br /><a class="unsub" href="#"
                                         style="color: #cccccc; text-decoration: underline">subscribe instantly</a>
                                 </p>
                             </td>
