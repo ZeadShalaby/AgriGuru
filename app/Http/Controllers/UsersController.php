@@ -54,6 +54,7 @@ class UsersController extends Controller
         }
         try {
             $user = User::create($request->all());
+            $this->Addmedia($user, '/images/users/users.png');
             Mail::to($user->email)->send(new VerifyMail($user));
             //? notification
             $this->successNotification($user, 403, "Sir : " . $user->name . " Verifiy Your Account look your email");
